@@ -240,7 +240,6 @@ NetworkX	Knowledge graph
 Gemini	LLM answer generation
 MCP	Tool interoperability
 Streamlit	User interface
-FastAPI	API-ready backend support
 Docker	Containerization
 NumPy	Numerical operations
 PyPDF	PDF document ingestion
