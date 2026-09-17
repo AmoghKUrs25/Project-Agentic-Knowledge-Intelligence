@@ -1,263 +1,275 @@
+# 🤖 Agentic Knowledge Intelligence System
 
+### Hybrid RAG + Knowledge Graph + LangGraph + Gemini + MCP
 
+An AI-powered knowledge intelligence system that combines **semantic vector retrieval**, **knowledge graph reasoning**, and **agentic orchestration** to generate grounded answers from a controlled knowledge base.
 
-# 🧠 Agentic Knowledge Intelligence System
-
-An AI-powered enterprise knowledge assistant that combines **Agentic RAG, Vector Search, Knowledge Graphs, LangGraph, Gemini, MCP, and Streamlit** to provide grounded and explainable answers from a knowledge base.
-
----
-
-
-
-## 🚀 Overview
-
-Traditional RAG systems retrieve documents and generate answers using a fixed pipeline.
-
-This project introduces an **agentic retrieval workflow** where the system decides how to retrieve information based on the user's question.
-
-The agent can:
-
-- Route queries to vector retrieval
-- Perform knowledge graph retrieval for relationship-based questions
-- Combine vector and graph evidence
-- Evaluate retrieval quality
-- Automatically retry weak retrieval
-- Generate grounded answers using Gemini
-- Expose retrieval capabilities through MCP tools
-- Display evidence, sources, scores, and agent decisions through a Streamlit UI
+The system is designed to retrieve relevant evidence, understand relationships between concepts, evaluate retrieval quality, retry weak retrieval, and generate a context-grounded response using Google Gemini.
 
 ---
-
-
 
 ## 🏗️ System Architecture
 
+![Agentic Knowledge Intelligence System Architecture](docs/architecture.png)
 
+### High-Level Flow
 
-
-
-
-
-
-✨ Key Features
-1. Agentic Query Routing
-
-The LangGraph agent analyzes the user's question and selects an appropriate retrieval strategy.
-
+```text
 User Query
     ↓
 LangGraph Agent
     ↓
-Query Router
-    ├── Vector Retrieval
-    └── Hybrid Retrieval
-          ├── Vector Search
-          └── Knowledge Graph
+Query Understanding
+    ↓
+Tool / Route Selection
+    ↓
+ ┌───────────────────────┐
+ │                       │
+Vector RAG          Knowledge Graph
+ │                       │
+FAISS               NetworkX
+ │                       │
+ └──────────┬────────────┘
+            ↓
+     Retrieved Evidence
+            ↓
+    Evidence Evaluation
+            ↓
+   Self-Correction Retry
+      (if evidence is weak)
+            ↓
+       Google Gemini
+            ↓
+   Grounded Final Answer
+            ↓
+       Streamlit UI
+
+
+
+🎯 Problem Statement
+
+Traditional knowledge assistants often rely only on keyword or semantic search.
+
+This can make it difficult to:
+
+retrieve information based on relationships between concepts
+combine document evidence with structured relationships
+detect weak retrieval results
+avoid generating unsupported answers
+provide visibility into how an answer was produced
+
+This project addresses these challenges using an agentic hybrid retrieval architecture.
 
 
 
 
 
-2. Semantic Vector Search
+💡 Solution
+
+The system combines two complementary retrieval strategies:
+
+🔹 Vector Retrieval
 
 Documents are:
 
-Loaded from the knowledge base
-Split into chunks
-Converted into embeddings
-Stored in a FAISS vector index
-Retrieved using semantic similarity
+loaded from the knowledge base
+split into chunks
+converted into embeddings using Sentence Transformers
+indexed using FAISS
+searched using semantic similarity
+
+This allows the system to retrieve information even when the user's wording differs from the source document.
 
 
+🔹 Knowledge Graph Retrieval
 
+A NetworkX knowledge graph stores relationships between entities and concepts.
 
-Embedding model:
-
-sentence-transformers/all-MiniLM-L6-v2
-
-Vector database/index:
-
-FAISS
-
-
-
-
-
-3. Knowledge Graph Retrieval
-
-The system maintains relationships between entities using NetworkX.
-
-Example:
+For example:
 
 Machine Learning
-├── Artificial Intelligence
-├── Data Science
-├── Python
-├── PyTorch
-├── TensorFlow
-├── Cloud Computing
-└── Training
+ ├── Artificial Intelligence
+ ├── Data Science
+ ├── Python
+ ├── PyTorch
+ ├── TensorFlow
+ ├── Cloud Computing
+ └── Training
 
 This allows the system to answer relationship-oriented questions.
 
-Example:
 
-What technologies are related to machine learning?
+🔹 Hybrid Agentic Retrieval
 
-The agent can use the knowledge graph to identify related technologies.
+LangGraph determines the retrieval path based on the user's query.
+
+Question
+   ↓
+Query Router
+   ↓
+ ┌───────────────┐
+ │               │
+Vector          Hybrid
+Search          Search
+ │               │
+ │          Knowledge Graph
+ │               +
+ │          Vector Retrieval
+ └───────┬───────┘
+         ↓
+ Evidence Evaluation
 
 
 
 
+🧠 Agentic Workflow
 
+The agent is implemented using LangGraph.
 
-4. Hybrid Retrieval
+The workflow contains:
 
-For relationship-oriented queries, the agent combines:
+Query Router
+Vector Search
+Knowledge Graph Search
+Evidence Evaluator
+Retrieval Retry
+Context Builder
+Gemini Answer Generator
+Self-Correction
 
-Vector Evidence
-       +
-Knowledge Graph Relationships
+The system evaluates the quality of retrieved evidence.
+
+If the retrieval score is weak, the agent automatically refines the query and performs another retrieval attempt.
+
+Initial Retrieval
        ↓
-Combined Context
+Evidence Evaluation
        ↓
+   ┌───┴────┐
+   │        │
+  Good     Weak
+   │        │
+   ↓        ↓
+Generate   Refine Query
+Answer        ↓
+              Retry
+                ↓
+          Generate Answer
+
+This provides a basic self-correcting retrieval loop rather than blindly generating an answer from the first search result.
+
+
+
+
+🔐 Grounded Answer Generation
+
+Google Gemini is instructed to generate answers only from the retrieved context.
+
+If the knowledge base does not contain sufficient information, the system can respond:
+
+"The available knowledge base does not contain enough information."
+
+
+This helps reduce unsupported responses.
+
+🔌 MCP Integration
+
+The project exposes retrieval capabilities as Model Context Protocol (MCP) tools.
+
+Available MCP Tools
+search_documents(query)
+
+Searches the vector knowledge base and returns relevant document evidence.
+
+search_knowledge_graph(entity)
+
+Searches the knowledge graph for related entities and relationships.
+
+MCP provides a standardized tool interface that can be connected to compatible AI agent clients.
+
+
+
+🖥️ Streamlit Interface
+
+The Streamlit interface provides visibility into the agent's decision process.
+
+It displays:
+
+🤖 Agent Answer
+🔀 Agent Decision
+📊 Evidence Evaluation Score
+🔗 Knowledge Graph Relationships
+📚 Retrieved Sources
+🔄 Retrieval Self-Correction Status
+⚙️ System Component Status
+
+
+
+Example pipeline shown in the UI:
+
+User Query
+    ↓
+Agent Router
+    ↓
+Vector RAG / Knowledge Graph
+    ↓
+Evidence Evaluation
+    ↓
 Gemini
-       ↓
+    ↓
 Grounded Answer
 
-This allows the system to use both semantic document evidence and structured relationships.
 
 
 
+🧪 Evaluation
 
+The project includes a small handcrafted retrieval evaluation suite containing 5 test questions covering:
 
-5. Evidence Evaluation
+Annual paid leave
+Service leave
+Technical training
+Password security
+Machine learning technologies
+Result
+Tests passed: 5/5
+Evaluation accuracy: 100.0%
 
-Retrieved evidence is evaluated before answer generation.
+The result represents a keyword-match retrieval criterion across the five handcrafted test cases, not a general benchmark of overall factual accuracy.
 
-The system checks the retrieval score and determines whether the retrieved information is sufficiently relevant.
-
-Retrieved Evidence
-       ↓
-Quality Evaluation
-       │
-       ├── Good → Generate Answer
-       │
-       └── Weak → Retry Retrieval
-
-
-
-
-
-6. Self-Correcting Retrieval
-
-When retrieval quality is weak, the agent automatically modifies the query and performs another retrieval attempt.
-
-Example:
-
-Original Query
-      ↓
-Vector Retrieval
-      ↓
-Weak Evidence
-      ↓
-Self-Correction
-      ↓
-Improved Query
-      ↓
-Re-retrieval
-      ↓
-Context
-      ↓
-Gemini
-
-This provides an agentic feedback loop instead of relying on a single retrieval attempt.
-
-
-
-
-7. Grounded Answer Generation
-
-Gemini receives the retrieved evidence as context.
-
-The generation prompt instructs the model to:
-
-Use supplied evidence
-Avoid inventing facts
-Return a knowledge-base limitation when evidence is insufficient
-
-Example:
-
-The available knowledge base does not contain enough information.
-
-This reduces unsupported answers.
-
-
-
-
-
-8. MCP Integration
-
-The project exposes retrieval capabilities through Model Context Protocol (MCP).
-
-Available MCP tools:
-
-search_documents
-search_knowledge_graph
-
-These tools allow external MCP-compatible agents or clients to access the project's retrieval capabilities.
-
-
-
-
-
-
-9. Interactive Streamlit UI
-
-The Streamlit interface provides:
-
-Knowledge base querying
-Agent decisions
-Retrieval strategy
-Evidence evaluation score
-Knowledge graph relationships
-Retrieved sources
-Retrieval self-correction status
-System component status
+The project also includes an unknown-question test to verify that the system can identify insufficient knowledge rather than inventing a policy answer.
 
 
 
 
 🛠️ Technology Stack
 
-Technology	Purpose
-Python	Core development
-LangGraph	Agent orchestration
-LangChain	AI/RAG ecosystem
-Sentence Transformers	Text embeddings
-FAISS	Vector similarity search
-NetworkX	Knowledge graph
-Gemini	LLM answer generation
-MCP	Tool interoperability
-Streamlit	User interface
-FastAPI	API-ready backend support
-Docker	Containerization
-NumPy	Numerical operations
-PyPDF	PDF document ingestion
+Category	Technologies
+Programming	Python
+Agent Framework	LangGraph
+LLM	Google Gemini
+RAG	Retrieval-Augmented Generation
+Embeddings	Sentence Transformers
+Vector Search	FAISS
+Knowledge Graph	NetworkX
+Tool Protocol	MCP
+Frontend	Streamlit
+API	FastAPI
+Document Processing	PyPDF
+Environment Management	Python-dotenv
+Containerization	Docker
+Version Control	Git, GitHub
 
 
 
 
-
-
-
-📁 Project Structure
+📂 Project Structure
 agentic-knowledge-intelligence/
 │
 ├── app/
 │   ├── agent/
-│   │   ├── graph.py
 │   │   ├── evaluator.py
+│   │   ├── graph.py
 │   │   └── graph_backup.py
 │   │
 │   ├── knowledge_graph/
@@ -266,15 +278,20 @@ agentic-knowledge-intelligence/
 │   ├── llm/
 │   │   └── gemini.py
 │   │
-│   └── rag/
-│       ├── embeddings.py
-│       ├── ingest.py
-│       ├── retriever.py
-│       └── vector_store.py
+│   ├── rag/
+│   │   ├── embeddings.py
+│   │   ├── ingest.py
+│   │   ├── retriever.py
+│   │   └── vector_store.py
+│   │
+│   └── tools/
 │
 ├── data/
 │   └── documents/
 │       └── company_policy.txt
+│
+├── docs/
+│   └── architecture.png
 │
 ├── frontend/
 │   └── app.py
@@ -286,227 +303,129 @@ agentic-knowledge-intelligence/
 │   └── evaluation.py
 │
 ├── Dockerfile
-├── README.md
+├── .dockerignore
+├── .gitignore
 ├── requirements.txt
-├── .env
-└── .gitignore
+└── README.md
 
 
 
 
 
 
-
-⚙️ Installation
-
-
+🚀 Getting Started
 
 1. Clone the repository
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd agentic-knowledge-intelligence
-
+git clone https://github.com/AmoghKUrs25/Project-Agentic-Knowledge-Intelligence.git
+cd Project-Agentic-Knowledge-Intelligence
 
 2. Create a virtual environment
-
-Windows PowerShell:
-
 python -m venv venv
 
-Activate it:
+Activate it on Windows:
 
 .\venv\Scripts\Activate.ps1
 
-
 3. Install dependencies
 pip install -r requirements.txt
-🔑 Environment Variables
+
+4. Configure Gemini API Key
 
 Create a .env file:
 
-GEMINI_API_KEY=your_gemini_api_key
+GEMINI_API_KEY=your_api_key_here
 
-Never commit the .env file to GitHub.
+Never commit the .env file or expose your API key publicly.
 
 
 
 
 ▶️ Run the Application
 
-From the project root:
+Start the Streamlit application:
 
 streamlit run frontend/app.py
 
-Then open:
+Open:
 
 http://localhost:8501
-
 
 
 
 🐳 Run with Docker
 
-Build the image:
+Build the Docker image:
 
 docker build -t agentic-knowledge-intelligence:1.0 .
 
-Run the container:
+Run the application:
 
-docker run -d --name agentic-knowledge-intelligence -p 8501:8501 --env-file .env agentic-knowledge-intelligence:1.0
+docker run --rm --env-file .env -p 8501:8501 agentic-knowledge-intelligence:1.0
 
-Verify:
-
-docker ps
-
-The application will be available at:
+Then open:
 
 http://localhost:8501
 
+The application has been tested successfully inside a Docker container.
 
 
 
-🧪 Evaluation
 
-The retrieval system was evaluated using five knowledge-base questions.
+🔬 Example Queries
 
-Test	Result
-Annual paid leave allowance	PASS
-Service leave eligibility	PASS
-Technical training	        PASS
-Password security requirements	PASS
-Machine learning technologies	PASS
-Evaluation Result
-Tests Passed: 5/5
-Evaluation Accuracy: 100%
-
-The evaluation measures whether the expected information was successfully retrieved for the defined test questions.
-
-
-
-🔍 Example Queries
-
-Policy Query
+Vector RAG Query
 What is the annual paid leave allowance?
 
-Expected retrieval strategy:
+The system retrieves relevant company-policy evidence and generates a grounded response.
 
-Vector RAG
-Relationship Query
+Hybrid Retrieval Query
 What technologies are related to machine learning?
 
-Expected retrieval strategy:
+The agent uses:
 
-Hybrid
+Knowledge Graph + Vector RAG
 
-The system can combine vector evidence with knowledge graph relationships.
+to retrieve both relationships and supporting document evidence.
 
-Unknown Information
+Unknown Knowledge Query
 What is the company policy for pet insurance?
 
-The system can identify insufficient evidence and return:
-
-The available knowledge base does not contain enough information.
+When sufficient evidence is unavailable, the system is designed to avoid inventing an answer.
 
 
 
 
-🔄 Agent Workflow
-
-The complete workflow is:
-
-1. Receive user question
-          ↓
-2. Analyze query
-          ↓
-3. Select retrieval strategy
-          ↓
-4. Retrieve relevant evidence
-          ↓
-5. Evaluate evidence quality
-          ↓
-6. Retry retrieval if evidence is weak
-          ↓
-7. Build grounded context
-          ↓
-8. Generate answer using Gemini
-          ↓
-9. Display answer + evidence
-
-
-
-
-💡 Why This Project Is Different
-
-This project goes beyond a basic chatbot or traditional RAG pipeline.
-
-Traditional RAG
-Query
- ↓
-Vector Search
- ↓
-LLM
- ↓
-Answer
-This Project
-Query
- ↓
-Agent
- ↓
-Routing
- ↓
-Vector / Graph / Hybrid Retrieval
- ↓
-Evidence Evaluation
- ↓
-Self-Correction
- ↓
-Grounded Generation
- ↓
-Answer + Evidence
-
-The architecture demonstrates concepts used in modern AI Agent and Retrieval-Augmented Generation systems.
-
-
-
-
-
-🎯 Learning Outcomes
-
-This project demonstrates practical experience with:
-
-Agentic AI
-Retrieval-Augmented Generation
-Semantic search
-Vector databases
-Knowledge graphs
-Graph-based retrieval
-LangGraph workflows
-LLM integration
-Retrieval evaluation
-Self-correcting agents
-MCP tool development
-Streamlit application development
-Docker containerization
-
-
-
-
-
+⭐ Key Features
+🧠 Agentic workflow using LangGraph
+🔎 Semantic vector search using FAISS
+🔗 Relationship-aware retrieval using NetworkX
+🔀 Hybrid vector + graph retrieval
+📊 Evidence quality evaluation
+🔄 Automatic retrieval retry
+🤖 Google Gemini grounded generation
+🔌 MCP retrieval tools
+📚 Source-aware responses
+🛡️ Insufficient-evidence handling
+🖥️ Interactive Streamlit dashboard
+🐳 Dockerized deployment
+🧪 Retrieval evaluation suite
 🔮 Future Improvements
+
+
 
 Potential extensions include:
 
-Persistent vector database
-Larger enterprise document collections
-Advanced query classification
-Reranking models
-Hybrid search scoring
-Knowledge graph extraction from documents
-Authentication and authorization
-REST API deployment
-Observability and tracing
-Automated evaluation benchmarks
-Cloud deployment
-
+persistent vector database
+larger document collections
+automatic knowledge graph extraction
+richer entity and relationship extraction
+improved retrieval evaluation metrics
+reranking models
+conversational memory
+multi-agent collaboration
+authentication and access control
+production deployment
+observability and tracing
 
 
 
@@ -514,12 +433,25 @@ Cloud deployment
 
 Amogh K Urs
 
-Computer Science & Engineering
+Computer Science & Engineering Student
+Focused on AI Agents, RAG, LLM Applications and Software Development.
 
-Interested in:
-Artificial Intelligence
-AI Agents
-RAG Systems
+Areas of Interest
+Agentic AI
+Retrieval-Augmented Generation
+Large Language Models
+Knowledge Graphs
+AI Application Development
 Backend Development
 DevOps
-Software Engineering
+
+
+
+📌 Project Highlights
+LangGraph       → Agent Orchestration
+FAISS           → Semantic Retrieval
+NetworkX        → Knowledge Graph
+MCP             → Tool Integration
+Gemini          → Grounded Generation
+Streamlit       → Interactive UI
+Docker          → Containerized Deployment
