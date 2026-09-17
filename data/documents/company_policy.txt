@@ -1,0 +1,51 @@
+COMPANY KNOWLEDGE BASE
+
+LEAVE POLICY
+
+Employees receive 24 days of annual paid leave per year.
+
+Employees who have completed more than two years of continuous service are eligible for an additional 5 days of service leave.
+
+Employees must submit planned leave requests at least three working days before the intended leave date.
+
+Emergency leave may be requested without the three-day advance requirement.
+
+TRAINING POLICY
+
+Employees can participate in technical training programs after completing six months of employment.
+
+Employees with more than two years of experience are eligible for advanced leadership training.
+
+Training requests must be approved by the employee's manager.
+
+Employees can participate in machine learning, cloud computing, cybersecurity and software engineering training programs.
+
+SECURITY POLICY
+
+Employees must use strong passwords containing at least twelve characters.
+
+Passwords must not be shared with other employees.
+
+Multi-factor authentication is required for company systems containing confidential information.
+
+Employees must report suspected security incidents to the security team immediately.
+
+PROJECT POLICY
+
+Machine learning projects may use Python, TensorFlow and PyTorch.
+
+Cloud projects commonly use AWS services.
+
+Cybersecurity projects require security review before deployment.
+
+Software engineering projects must include automated testing before production deployment.
+
+PROJECT RELATIONSHIPS
+
+Machine learning is related to artificial intelligence and data science.
+
+Cloud computing is related to distributed systems and machine learning infrastructure.
+
+Cybersecurity is related to authentication, authorization and secure software development.
+
+Training programs are related to employee development and technical skill improvement.
